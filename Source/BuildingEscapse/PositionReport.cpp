@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PositionReport.h"
+#include "Gameframework/Actor.h"
 
 // Sets default values for this component's properties
 UPositionReport::UPositionReport()
@@ -8,8 +9,7 @@ UPositionReport::UPositionReport()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	UE_LOG(LogTemp, Warning, TEXT("UPositionReport::UPositionReport() called"));
+	UE_LOG(LogTemp, Warning, TEXT(__FUNCTION__));
 }
 
 
@@ -17,8 +17,9 @@ UPositionReport::UPositionReport()
 void UPositionReport::BeginPlay()
 {
 	Super::BeginPlay();
+	m_ownerName = GetOwner()->GetName();
 
-	UE_LOG(LogTemp, Warning, TEXT("UPositionReport::BeginPlay() called"));	
+	UE_LOG(LogTemp, Warning, TEXT("UPositionReport::BeginPlay() called on %s"), *m_ownerName);
 }
 
 

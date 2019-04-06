@@ -18,8 +18,10 @@ void UPositionReport::BeginPlay()
 {
 	Super::BeginPlay();
 	m_ownerName = GetOwner()->GetName();
-
-	UE_LOG(LogTemp, Warning, TEXT("UPositionReport::BeginPlay() called on %s"), *m_ownerName);
+	m_owerTransform = GetOwner()->GetTransform();
+	const FVector ownerPos = m_owerTransform.GetLocation();
+	m_positionString = ownerPos.ToString();
+	UE_LOG(LogTemp, Warning, TEXT("UPositionReport::BeginPlay() called on %s positioned at %s"), *m_ownerName, *m_positionString);
 }
 
 

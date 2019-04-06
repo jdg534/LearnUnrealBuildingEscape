@@ -26,4 +26,6 @@ public:
 
 private:
 	FString m_ownerName;
+	FString m_positionString;
+	FTransform m_owerTransform;
 };

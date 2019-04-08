@@ -31,8 +31,18 @@ void UOpenDoor::BeginPlay()
 
 	FString startingRotatorStr = rotator.ToString();
 
-	// ...
 	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s starting rotator %s"), *ownerName, *startingRotatorStr);
+
+	if(DoorOpenTriggerVolume)
+	{
+		const FString triggerVolumeName = DoorOpenTriggerVolume->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated"), *ownerName, *triggerVolumeName);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s doesn't have a trigger volume associated, you need to define one for it to work"), *ownerName);
+	}
+
 }
 
 

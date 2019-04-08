@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Engine/TriggerVolume.h"
+
 #include "OpenDoor.generated.h"
+
+
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -27,6 +31,11 @@ public:
 private:
 
 	AActor* m_owner;
-	float m_doorYaw;
+	UPROPERTY(VisibleAnywhere)
+	float m_doorYaw = -10.0f;
+	
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* DoorOpenTriggerVolume;
+
 	const float m_defaultDoorYaw = -10.0f; // would do this on constructor, unreal build tool complained
 };

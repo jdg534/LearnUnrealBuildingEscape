@@ -30,6 +30,9 @@ public:
 
 private:
 
+	void OpenDoor();
+	void CloseDoor();
+
 	AActor* m_owner;
 	UPROPERTY(VisibleAnywhere)
 	float m_doorYaw = -10.0f;
@@ -37,5 +40,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* DoorOpenTriggerVolume;
 
-	const float m_defaultDoorYaw = -10.0f; // would do this on constructor, unreal build tool complained
+	UPROPERTY(EditAnywhere)
+	AActor* OpenDoorFor;
+
+	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
 };

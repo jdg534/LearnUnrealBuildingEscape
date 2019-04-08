@@ -20,27 +20,19 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
-
 	m_owner = GetOwner();
 	FString ownerName = m_owner->GetName();
-	// Unreal handles rotations with Quaternions, need to figure out how to euler rotation in specfic axis
+	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s"), *ownerName);
 
-	FRotator rotator(0.0f, m_defaultDoorYaw, 0.0f); // Docs say it's in degrees, use Yaw.
-
-	m_owner->SetActorRotation(rotator);
-
-	FString startingRotatorStr = rotator.ToString();
-
-	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s starting rotator %s"), *ownerName, *startingRotatorStr);
-
-	if(DoorOpenTriggerVolume)
+	if(DoorOpenTriggerVolume && OpenDoorFor)
 	{
+		const FString openForName = OpenDoorFor->GetName();
 		const FString triggerVolumeName = DoorOpenTriggerVolume->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated"), *ownerName, *triggerVolumeName);
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated and will open for %s"), *ownerName, *triggerVolumeName, *openForName);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s doesn't have a trigger volume associated, you need to define one for it to work"), *ownerName);
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s needs a trigger volume and Actor to open for"), *ownerName);
 	}
 
 }
@@ -52,5 +44,26 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	// polling for now, need to add a on collide callback
+	if (DoorOpenTriggerVolume->IsOverlappingActor(OpenDoorFor))
+	{
+		OpenDoor();
+	}
+	else
+	{
+		CloseDoor();
+	}
 }
 
+
+void UOpenDoor::OpenDoor()
+{
+	FRotator rotator(0.0f, c_DoorOpenYaw, 0.0f); // Docs say it's in degrees, use Yaw.
+	m_owner->SetActorRotation(rotator);
+}
+
+void UOpenDoor::CloseDoor()
+{
+	FRotator rotator(0.0f, 0.0f, 0.0f);
+	m_owner->SetActorRotation(rotator);
+}

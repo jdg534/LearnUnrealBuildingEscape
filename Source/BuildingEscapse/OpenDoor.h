@@ -29,7 +29,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-
 	void OpenDoor();
 	void CloseDoor();
 
@@ -39,9 +38,6 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* DoorOpenTriggerVolume;
-
-	UPROPERTY(EditAnywhere)
 	AActor* OpenDoorFor;
-
 	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
 };

@@ -24,6 +24,11 @@ void UOpenDoor::BeginPlay()
 	FString ownerName = m_owner->GetName();
 	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s"), *ownerName);
 
+	UWorld* world = GetWorld();
+
+	OpenDoorFor = world->GetFirstPlayerController()->GetPawn();
+
+
 	if(DoorOpenTriggerVolume && OpenDoorFor)
 	{
 		const FString openForName = OpenDoorFor->GetName();

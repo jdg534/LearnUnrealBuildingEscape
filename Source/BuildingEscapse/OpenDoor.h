@@ -33,11 +33,18 @@ private:
 	void CloseDoor();
 
 	AActor* m_owner;
+
 	UPROPERTY(VisibleAnywhere)
 	float m_doorYaw = -10.0f;
+
+	UPROPERTY(EditAnywhere)
+	float SecondsToCloseDoorAfter;
 	
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* DoorOpenTriggerVolume;
 	AActor* OpenDoorFor;
 	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
+	
+	bool m_doorOpen;
+	float m_timeOfLastOpenDoor;
 };

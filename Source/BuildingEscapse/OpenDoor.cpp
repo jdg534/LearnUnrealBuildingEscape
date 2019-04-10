@@ -7,6 +7,7 @@
 UOpenDoor::UOpenDoor()
 	: m_owner(nullptr)
 	, m_doorYaw(-10.0f)
+	, m_doorOpen(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -28,6 +29,7 @@ void UOpenDoor::BeginPlay()
 
 	OpenDoorFor = world->GetFirstPlayerController()->GetPawn();
 
+	m_timeOfLastOpenDoor = world->GetTimeSeconds();
 
 	if(DoorOpenTriggerVolume && OpenDoorFor)
 	{
@@ -54,21 +56,26 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		OpenDoor();
 	}
-	else
+
+	float now = GetWorld()->GetTimeSeconds();
+	if (m_doorOpen && now >= (m_timeOfLastOpenDoor + SecondsToCloseDoorAfter))
 	{
 		CloseDoor();
 	}
-}
 
+}
 
 void UOpenDoor::OpenDoor()
 {
 	FRotator rotator(0.0f, c_DoorOpenYaw, 0.0f); // Docs say it's in degrees, use Yaw.
 	m_owner->SetActorRotation(rotator);
+	m_doorOpen = true;
+	m_timeOfLastOpenDoor = GetWorld()->GetTimeSeconds();
 }
 
 void UOpenDoor::CloseDoor()
 {
-	FRotator rotator(0.0f, 0.0f, 0.0f);
+	FRotator rotator(0.0f, m_doorYaw, 0.0f);
 	m_owner->SetActorRotation(rotator);
+	m_doorOpen = false;
 }

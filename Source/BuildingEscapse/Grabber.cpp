@@ -30,7 +30,13 @@ void UGrabber::BeginPlay()
 	m_playerControllerPtr = GetWorld()->GetFirstPlayerController();
 	if (!m_playerControllerPtr)
 	{ 
-		UE_LOG(LogTemp, Error, TEXT("UGrabber couldn't get a pointer to the default player controller"));
+		UE_LOG(LogTemp, Warning, TEXT("UGrabber couldn't get a pointer to the default player controller"));
+	}
+
+	m_PhysicsHandleComponent = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (!m_PhysicsHandleComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UGrabber on %s couldn't get a pointer to a PhysicsHandleComponent"), *GetOwner()->GetName());
 	}
 }
 

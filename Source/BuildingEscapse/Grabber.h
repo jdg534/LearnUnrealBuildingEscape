@@ -27,13 +27,17 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
+	bool FindPhysicsHandleComponent();
+	bool FindPlayerController();
+	bool FindInputComponent();
+	void BindActions();
+
+	const FHitResult GetFirstPhysicBodyInReach() const; // can't be const, m_playerControllerPtr->GetPlayerViewPoint 
 
 	void Grab();
 	void Release();
 
 	APlayerController* m_playerControllerPtr;
-	FVector m_position;
-	FRotator m_rotation;
 
 	// how long the grabber's reach is, this is in cm
 	UPROPERTY(EditAnywhere)

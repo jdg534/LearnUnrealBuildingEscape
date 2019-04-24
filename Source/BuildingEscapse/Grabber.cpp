@@ -11,6 +11,7 @@
 // Sets default values for this component's properties
 UGrabber::UGrabber()
 	: m_playerControllerPtr(nullptr)
+	, m_actorInputComponent(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -37,6 +38,19 @@ void UGrabber::BeginPlay()
 	if (!m_PhysicsHandleComponent)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UGrabber on %s couldn't get a pointer to a PhysicsHandleComponent"), *GetOwner()->GetName());
+	}
+
+	m_actorInputComponent = GetOwner()->FindComponentByClass<UInputComponent>(); // it's just a public member variable!?
+	if (m_actorInputComponent)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UGrabber on %s has a Input Component"), *GetOwner()->GetName());
+
+		// Bind the "Grab" action 
+		m_actorInputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UGrabber on %s couldn't get a pointer to a Input Component"), *GetOwner()->GetName());
 	}
 }
 
@@ -85,3 +99,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	}
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab() called"));
+}

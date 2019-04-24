@@ -47,6 +47,7 @@ void UGrabber::BeginPlay()
 
 		// Bind the "Grab" action 
 		m_actorInputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		m_actorInputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
 	else
 	{
@@ -66,7 +67,6 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	UWorld* worldPtr = GetWorld();
 
-	UE_LOG(LogTemp, Warning, TEXT("UGrabber::BeginPlay() called"));
 	const FString posStr = m_position.ToString();
 	const FString rotationStr = m_rotation.ToString();
 	const FVector rotationAsUnitVector = m_rotation.Vector();
@@ -102,4 +102,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab() called"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Release() called"));
 }

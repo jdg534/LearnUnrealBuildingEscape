@@ -29,6 +29,7 @@ public:
 private:
 
 	void Grab();
+	void Release();
 
 	APlayerController* m_playerControllerPtr;
 	FVector m_position;

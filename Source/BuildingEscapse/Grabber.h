@@ -47,4 +47,6 @@ private:
 	UPhysicsHandleComponent* m_PhysicsHandleComponent = nullptr;
 
 	UInputComponent* m_actorInputComponent;
+
+
 };

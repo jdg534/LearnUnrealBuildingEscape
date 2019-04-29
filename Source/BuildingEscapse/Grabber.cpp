@@ -42,6 +42,17 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// update "grabbed" actor if holding
+	if (m_PhysicsHandleComponent->GrabbedComponent)
+	{
+		FVector position;
+		FRotator rotation;
+
+		m_playerControllerPtr->GetPlayerViewPoint(position, rotation);
+
+		const FVector rotationAsUnitVector = rotation.Vector();
+		const FVector lineEndPos = position + (rotationAsUnitVector * Reach);
+		m_PhysicsHandleComponent->SetTargetLocation(lineEndPos);
+	}
 }
 
 bool UGrabber::FindPhysicsHandleComponent()
@@ -128,10 +139,16 @@ void UGrabber::Grab()
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab() called"));
 
 	// ray cast for a actor with the physics body collision channel
-
-	// attach physics handle (TODO)
-	const FHitResult hitRes = GetFirstPhysicBodyInReach();
-
+	
+	FHitResult hitRes = GetFirstPhysicBodyInReach();
+	UPrimitiveComponent* ComponentToGrab = hitRes.GetComponent();
+	AActor* hitActor = hitRes.GetActor();
+	
+	if (hitActor)
+	{
+		// attach physics handle (TODO)
+		m_PhysicsHandleComponent->GrabComponent(ComponentToGrab, NAME_None, ComponentToGrab->GetOwner()->GetActorLocation(), true); // true = allow rotation
+	}
 }
 
 void UGrabber::Release()
@@ -139,4 +156,5 @@ void UGrabber::Release()
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Release() called"));
 
 	// release the physics handle if attached
+	m_PhysicsHandleComponent->ReleaseComponent();
 }

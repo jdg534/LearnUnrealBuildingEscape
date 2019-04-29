@@ -48,5 +48,6 @@ private:
 
 	UInputComponent* m_actorInputComponent;
 
-
+	FVector m_position;
+	FRotator m_rotator; // not to be confused with rotation, need to
 };

@@ -12,6 +12,8 @@
 UGrabber::UGrabber()
 	: m_playerControllerPtr(nullptr)
 	, m_actorInputComponent(nullptr)
+	, m_position(0.0f, 0.0f, 0.0f)
+	, m_rotator(0.0f, 0.0f, 0.0f)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -44,14 +46,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// update "grabbed" actor if holding
 	if (m_PhysicsHandleComponent->GrabbedComponent)
 	{
-		FVector position;
-		FRotator rotation;
+		// Called as could have moved since 
+		m_playerControllerPtr->GetPlayerViewPoint(m_position, m_rotator);
 
-		m_playerControllerPtr->GetPlayerViewPoint(position, rotation);
-
-		const FVector rotationAsUnitVector = rotation.Vector();
-		const FVector lineEndPos = position + (rotationAsUnitVector * Reach);
-		m_PhysicsHandleComponent->SetTargetLocation(lineEndPos);
+		const FVector rotationAsUnitVector = m_rotator.Vector();
+		const FVector endOfReachLine = m_position + (rotationAsUnitVector * Reach);
+		m_PhysicsHandleComponent->SetTargetLocation(endOfReachLine);
 	}
 }
 
@@ -96,15 +96,9 @@ void UGrabber::BindActions()
 
 const FHitResult UGrabber::GetFirstPhysicBodyInReach() const
 {
-	FVector position;
-	FRotator rotation;
-
-	m_playerControllerPtr->GetPlayerViewPoint(position, rotation);
-
 	UWorld* worldPtr = GetWorld();
-
-	const FVector rotationAsUnitVector = rotation.Vector();
-	const FVector lineEndPos = position + (rotationAsUnitVector * Reach);
+	const FVector rotationAsUnitVector = m_rotator.Vector();
+	const FVector lineEndPos = m_position + (rotationAsUnitVector * Reach);
 
 	// uncomment if we need the grab range
 	// constexpr FColor debugLineColour(255, 0, 0);
@@ -117,7 +111,7 @@ const FHitResult UGrabber::GetFirstPhysicBodyInReach() const
 	bool hit =
 		worldPtr->LineTraceSingleByObjectType(
 			hitResult,
-			position,
+			m_position,
 			lineEndPos,
 			FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 			queryParams
@@ -138,8 +132,10 @@ void UGrabber::Grab()
 {
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab() called"));
 
+	// update m_position and m_rotator
+	m_playerControllerPtr->GetPlayerViewPoint(m_position, m_rotator);
+
 	// ray cast for a actor with the physics body collision channel
-	
 	FHitResult hitRes = GetFirstPhysicBodyInReach();
 	UPrimitiveComponent* ComponentToGrab = hitRes.GetComponent();
 	AActor* hitActor = hitRes.GetActor();

@@ -6,7 +6,7 @@
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 	: m_owner(nullptr)
-	, m_doorYaw(-10.0f)
+	, DoorClosedYaw(-10.0f)
 	, m_doorOpen(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
@@ -27,15 +27,12 @@ void UOpenDoor::BeginPlay()
 
 	UWorld* world = GetWorld();
 
-	OpenDoorFor = world->GetFirstPlayerController()->GetPawn();
-
 	m_timeOfLastOpenDoor = world->GetTimeSeconds();
 
-	if(DoorOpenTriggerVolume && OpenDoorFor)
+	if(DoorOpenTriggerVolume)
 	{
-		const FString openForName = OpenDoorFor->GetName();
 		const FString triggerVolumeName = DoorOpenTriggerVolume->GetName();
-		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated and will open for %s"), *ownerName, *triggerVolumeName, *openForName);
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated"), *ownerName, *triggerVolumeName);
 	}
 	else
 	{
@@ -51,8 +48,9 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	// polling for now, need to add a on collide callback
-	if (DoorOpenTriggerVolume->IsOverlappingActor(OpenDoorFor))
+	// will need an overlap event 
+
+	if (GetNetMassOnTriggerPlate() >= RequiredMassToOpen)
 	{
 		OpenDoor();
 	}
@@ -75,7 +73,24 @@ void UOpenDoor::OpenDoor()
 
 void UOpenDoor::CloseDoor()
 {
-	FRotator rotator(0.0f, m_doorYaw, 0.0f);
+	FRotator rotator(0.0f, DoorClosedYaw, 0.0f);
 	m_owner->SetActorRotation(rotator);
 	m_doorOpen = false;
+}
+
+const float UOpenDoor::GetNetMassOnTriggerPlate()
+{
+	// query the plate trigger volume for all actors, sum mass and return
+	float netMass = 0.0f;
+	TArray<AActor*> l_overlappingActors;
+	DoorOpenTriggerVolume->GetOverlappingActors(l_overlappingActors); // could 
+
+	const int32 iActorCount = l_overlappingActors.Num();
+	for (const auto& actorRef : l_overlappingActors)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::GetNetMassOnTriggerPlate() picked up %s"), *actorRef->GetName());
+		netMass += actorRef->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+
+	return netMass;
 }

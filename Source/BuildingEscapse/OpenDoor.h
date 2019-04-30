@@ -31,20 +31,23 @@ public:
 private:
 	void OpenDoor();
 	void CloseDoor();
+	const float GetNetMassOnTriggerPlate(); // note return value in kg
 
 	AActor* m_owner;
-
-	UPROPERTY(VisibleAnywhere)
-	float m_doorYaw = -10.0f;
 
 	UPROPERTY(EditAnywhere)
 	float SecondsToCloseDoorAfter;
 	
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* DoorOpenTriggerVolume;
-	AActor* OpenDoorFor;
-	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
 	
+	UPROPERTY(EditAnywhere)
+	float RequiredMassToOpen = 50.0f;
+
+	UPROPERTY(VisibleAnywhere)
+	float DoorClosedYaw = -10.0f;
+
+	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
 	bool m_doorOpen;
 	float m_timeOfLastOpenDoor;
 };

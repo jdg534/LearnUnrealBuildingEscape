@@ -36,7 +36,7 @@ void UOpenDoor::BeginPlay()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s needs a trigger volume and Actor to open for"), *ownerName);
+		UE_LOG(LogTemp, Error, TEXT("UOpenDoor %s needs a trigger volume and Actor to open for"), *ownerName);
 	}
 
 }
@@ -50,7 +50,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	// ...
 	// will need an overlap event 
 
-	if (GetNetMassOnTriggerPlate() >= RequiredMassToOpen)
+	if (DoorOpenTriggerVolume && GetNetMassOnTriggerPlate() >= RequiredMassToOpen)
 	{
 		OpenDoor();
 	}
@@ -80,12 +80,16 @@ void UOpenDoor::CloseDoor()
 
 const float UOpenDoor::GetNetMassOnTriggerPlate()
 {
+	if (DoorOpenTriggerVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s's OpenDoor::GetNetMassOnTriggerPlate() can't run due to lack of a trigger volume"), *GetOwner()->GetName());
+	}
+
 	// query the plate trigger volume for all actors, sum mass and return
 	float netMass = 0.0f;
 	TArray<AActor*> l_overlappingActors;
 	DoorOpenTriggerVolume->GetOverlappingActors(l_overlappingActors); // could 
 
-	const int32 iActorCount = l_overlappingActors.Num();
 	for (const auto& actorRef : l_overlappingActors)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::GetNetMassOnTriggerPlate() picked up %s"), *actorRef->GetName());

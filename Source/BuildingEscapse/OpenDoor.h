@@ -39,7 +39,7 @@ private:
 	float SecondsToCloseDoorAfter;
 	
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* DoorOpenTriggerVolume;
+	ATriggerVolume* DoorOpenTriggerVolume = nullptr;
 	
 	UPROPERTY(EditAnywhere)
 	float RequiredMassToOpen = 50.0f;

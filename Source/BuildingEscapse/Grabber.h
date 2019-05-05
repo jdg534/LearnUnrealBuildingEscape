@@ -37,7 +37,7 @@ private:
 	void Grab();
 	void Release();
 
-	APlayerController* m_playerControllerPtr;
+	APlayerController* m_playerControllerPtr = nullptr;
 
 	// how long the grabber's reach is, this is in cm
 	UPROPERTY(EditAnywhere)
@@ -46,7 +46,7 @@ private:
 	// UPROPERTY(EditAnywhere)
 	UPhysicsHandleComponent* m_PhysicsHandleComponent = nullptr;
 
-	UInputComponent* m_actorInputComponent;
+	UInputComponent* m_actorInputComponent = nullptr;
 
 	FVector m_position;
 	FRotator m_rotator; // not to be confused with rotation, need to

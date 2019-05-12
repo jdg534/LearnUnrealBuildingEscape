@@ -65,17 +65,14 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UOpenDoor::OpenDoor()
 {
-	FRotator rotator(0.0f, c_DoorOpenYaw, 0.0f); // Docs say it's in degrees, use Yaw.
-	m_owner->SetActorRotation(rotator);
-	m_doorOpen = true;
-	m_timeOfLastOpenDoor = GetWorld()->GetTimeSeconds();
+	OnOpenRequest.Broadcast();
 }
 
 void UOpenDoor::CloseDoor()
 {
-	FRotator rotator(0.0f, DoorClosedYaw, 0.0f);
-	m_owner->SetActorRotation(rotator);
-	m_doorOpen = false;
+	// this needs to be refactored
+
+	return; // part way through lecture on blue print events
 }
 
 const float UOpenDoor::GetNetMassOnTriggerPlate()

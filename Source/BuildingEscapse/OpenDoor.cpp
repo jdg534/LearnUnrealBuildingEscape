@@ -1,30 +1,38 @@
 // (learning unreal)
 
-#include "DoorController.h"
+#include "OpenDoor.h"
 #include "Gameframework/Actor.h"
 
 // Sets default values for this component's properties
-UDoorController::UDoorController()
+UOpenDoor::UOpenDoor()
 	: m_owner(nullptr)
+	, DoorClosedYaw(-10.0f)
+	, m_doorOpen(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+
+	// ...
 }
 
 
 // Called when the game starts
-void UDoorController::BeginPlay()
+void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	m_owner = GetOwner();
 	FString ownerName = m_owner->GetName();
 	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s"), *ownerName);
 
+	UWorld* world = GetWorld();
+
+	m_timeOfLastOpenDoor = world->GetTimeSeconds();
+
 	if(DoorOpenTriggerVolume)
 	{
 		const FString triggerVolumeName = DoorOpenTriggerVolume->GetName();
-		UE_LOG(LogTemp, Log, TEXT("UOpenDoor %s has trigger volume %s associated"), *ownerName, *triggerVolumeName);
+		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor %s has trigger volume %s associated"), *ownerName, *triggerVolumeName);
 	}
 	else
 	{
@@ -35,24 +43,39 @@ void UDoorController::BeginPlay()
 
 
 // Called every frame
-void UDoorController::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const float massOnTriggerVolume = GetNetMassOnTriggerPlate();
+	// ...
+	// will need an overlap event 
 
-	if (massOnTriggerVolume >= RequiredMassToOpen)
+	if (DoorOpenTriggerVolume && GetNetMassOnTriggerPlate() >= RequiredMassToOpen)
 	{
-		OnOpen.Broadcast();
+		OpenDoor();
 	}
-	else
+
+	float now = GetWorld()->GetTimeSeconds();
+	if (m_doorOpen && now >= (m_timeOfLastOpenDoor + SecondsToCloseDoorAfter))
 	{
-		OnClose.Broadcast();
+		CloseDoor();
 	}
 
 }
 
-const float UDoorController::GetNetMassOnTriggerPlate()
+void UOpenDoor::OpenDoor()
+{
+	OnOpenRequest.Broadcast();
+}
+
+void UOpenDoor::CloseDoor()
+{
+	// this needs to be refactored
+
+	return; // part way through lecture on blue print events
+}
+
+const float UOpenDoor::GetNetMassOnTriggerPlate()
 {
 	if (DoorOpenTriggerVolume == nullptr)
 	{

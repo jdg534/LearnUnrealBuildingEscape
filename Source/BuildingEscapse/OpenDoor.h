@@ -8,7 +8,8 @@
 
 #include "OpenDoor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpen);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnClose);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -30,28 +31,19 @@ public:
 
 	// Blueprint events
 	UPROPERTY(BlueprintAssignable)
-	FOnOpenRequest OnOpenRequest;
+	FOnOpen OnOpen;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnClose OnClose;
 
 private:
-	void OpenDoor();
-	void CloseDoor();
 	const float GetNetMassOnTriggerPlate(); // note return value in kg
 
 	AActor* m_owner;
 
 	UPROPERTY(EditAnywhere)
-	float SecondsToCloseDoorAfter;
-	
-	UPROPERTY(EditAnywhere)
 	ATriggerVolume* DoorOpenTriggerVolume = nullptr;
 	
 	UPROPERTY(EditAnywhere)
-	float RequiredMassToOpen = 50.0f;
-
-	UPROPERTY(VisibleAnywhere)
-	float DoorClosedYaw = -10.0f;
-
-	const float c_DoorOpenYaw = -80.0f; // would do this on constructor, unreal build tool complained
-	bool m_doorOpen;
-	float m_timeOfLastOpenDoor;
+	float RequiredMassToOpen = 50.0f;	
 };

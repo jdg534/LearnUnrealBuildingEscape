@@ -6,8 +6,6 @@
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 	: m_owner(nullptr)
-	, DoorClosedYaw(-10.0f)
-	, m_doorOpen(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -24,10 +22,6 @@ void UOpenDoor::BeginPlay()
 	m_owner = GetOwner();
 	FString ownerName = m_owner->GetName();
 	UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::BeginPlay() called on %s"), *ownerName);
-
-	UWorld* world = GetWorld();
-
-	m_timeOfLastOpenDoor = world->GetTimeSeconds();
 
 	if(DoorOpenTriggerVolume)
 	{
@@ -47,51 +41,38 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
-	// will need an overlap event 
+	const float netMassOnTriggerPlate = GetNetMassOnTriggerPlate();
 
-	if (DoorOpenTriggerVolume && GetNetMassOnTriggerPlate() >= RequiredMassToOpen)
+	if (netMassOnTriggerPlate >= RequiredMassToOpen)
 	{
-		OpenDoor();
+		OnOpen.Broadcast();
 	}
-
-	float now = GetWorld()->GetTimeSeconds();
-	if (m_doorOpen && now >= (m_timeOfLastOpenDoor + SecondsToCloseDoorAfter))
+	else if (netMassOnTriggerPlate < RequiredMassToOpen)
 	{
-		CloseDoor();
+		OnClose.Broadcast();
 	}
-
-}
-
-void UOpenDoor::OpenDoor()
-{
-	OnOpenRequest.Broadcast();
-}
-
-void UOpenDoor::CloseDoor()
-{
-	// this needs to be refactored
-
-	return; // part way through lecture on blue print events
 }
 
 const float UOpenDoor::GetNetMassOnTriggerPlate()
 {
-	if (DoorOpenTriggerVolume == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s's OpenDoor::GetNetMassOnTriggerPlate() can't run due to lack of a trigger volume"), *GetOwner()->GetName());
-	}
-
 	// query the plate trigger volume for all actors, sum mass and return
 	float netMass = 0.0f;
+
+	if (DoorOpenTriggerVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Log, TEXT("%s's OpenDoor::GetNetMassOnTriggerPlate() can't run due to lack of a trigger volume"), *GetOwner()->GetName());
+		return netMass;
+	}
+	
 	TArray<AActor*> l_overlappingActors;
 	DoorOpenTriggerVolume->GetOverlappingActors(l_overlappingActors); // could 
 
 	for (const auto& actorRef : l_overlappingActors)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::GetNetMassOnTriggerPlate() picked up %s"), *actorRef->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("UOpenDoor::GetNetMassOnTriggerPlate() picked up %s"), *actorRef->GetName());
 		netMass += actorRef->FindComponentByClass<UPrimitiveComponent>()->GetMass();
 	}
 
+	UE_LOG(LogTemp, Log, TEXT("UOpenDoor::GetNetMassOnTriggerPlate() returned %f"), netMass);
 	return netMass;
 }
